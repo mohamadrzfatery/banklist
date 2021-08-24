@@ -68,13 +68,12 @@ const displayMovments = function (movements) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
     const html = `<div class="movements__row">
     <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
-    <div class="movements__value">${mov}</div>
+    <div class="movements__value">${mov}€</div>
   </div>`;
 
     containerMovements.insertAdjacentHTML('afterbegin', html); //if we type beforeend all data would be inverted
   });
 };
-displayMovments(account1.movements);
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
@@ -86,13 +85,34 @@ displayMovments(account1.movements);
 // ]);
 
 // const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
-
+let currentAccount;
 /////////////////////////////////////////////////
+btnLogin.addEventListener('click', function (e) {
+  e.preventDefault();
+  currentAccount = accounts.find(
+    acc => acc.username === inputLoginUsername.value
+  );
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+    labelWelcome.textContent = `welcome back, ${
+      currentAccount.owner.split(' ')[0]
+    }`;
+    containerApp.style.opacity = 100;
+
+    inputLoginUsername.value = inputLoginPin.value = '';
+    inputLoginPin.blur(); //move focus on input away
+
+    displayMovments(currentAccount.movements);
+
+    calcDisplayBalance(currentAccount.movements);
+
+    calcDisplaySummary(currentAccount);
+  }
+});
+
 const calcDisplayBalance = function (movements) {
   const balance = movements.reduce((acc, mov) => acc + mov, 0);
-  labelBalance.textContent = `${balance} EUR`;
+  labelBalance.textContent = `${balance}€`;
 };
-calcDisplayBalance(account1.movements);
 const createUsernames = function (accs) {
   accs.forEach(function (acc) {
     acc.username = acc.owner
@@ -103,9 +123,50 @@ const createUsernames = function (accs) {
   });
 };
 createUsernames(accounts);
-console.log(account1.movements);
 
-const withdrawals = account1.movements.filter(function (mov) {
-  return mov < 0;
-});
-console.log(withdrawals);
+const calcDisplaySummary = function (acc) {
+  const incomes = acc.movements
+    .filter(mov => mov > 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  labelSumIn.textContent = `${incomes}€`;
+
+  const out = acc.movements
+    .filter(mov => mov < 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  labelSumOut.textContent = `${Math.abs(out)}€`;
+
+  const interest = acc.movements
+    .filter(mov => mov > 0)
+    .map(deposit => (deposit * acc.interestRate) / 100)
+    .filter((int, i) => {
+      return int >= 1;
+    })
+    .reduce((acc, int) => acc + int, 0);
+  labelSumInterest.textContent = `${interest}€`;
+};
+// const withdrawals = myarr.movements.filter(function (mov) {
+//   return mov < 0;
+// });
+
+//dog challenge
+// const dogsages = [5, 2, 4, 1, 15, 8, 3];
+// const dogsages2 = [16, 6, 10, 5, 6, 1, 4];
+// const calcAverageHumanAge = ages => {
+//   const avg = ages
+//     .map((age, i) => {
+//       if (age <= 2) {
+//         return 2 * age;
+//       } else {
+//         return 16 + age * 4;
+//       }
+//     })
+//     .filter(age => {
+//       return age >= 18;
+//     })
+//     .reduce((acc, age, i, arr) => acc + age / arr.length, 0);
+
+//   console.log(avg);
+// };
+
+// calcAverageHumanAge(dogsages);
+// calcAverageHumanAge(dogsages2);
