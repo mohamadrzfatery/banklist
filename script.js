@@ -63,6 +63,7 @@ const inputClosePin = document.querySelector('.form__input--pin');
 
 const displayMovments = function (movements) {
   containerMovements.innerHTML = '';
+
   movements.forEach(function (mov, i) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
     const html = `<div class="movements__row">
@@ -70,7 +71,7 @@ const displayMovments = function (movements) {
     <div class="movements__value">${mov}</div>
   </div>`;
 
-    containerMovements.insertAdjacentHTML('afterbegin', html);
+    containerMovements.insertAdjacentHTML('afterbegin', html); //if we type beforeend all data would be inverted
   });
 };
 displayMovments(account1.movements);
@@ -87,3 +88,24 @@ displayMovments(account1.movements);
 // const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 /////////////////////////////////////////////////
+const calcDisplayBalance = function (movements) {
+  const balance = movements.reduce((acc, mov) => acc + mov, 0);
+  labelBalance.textContent = `${balance} EUR`;
+};
+calcDisplayBalance(account1.movements);
+const createUsernames = function (accs) {
+  accs.forEach(function (acc) {
+    acc.username = acc.owner
+      .toLowerCase()
+      .split(' ')
+      .map(name => name[0])
+      .join('');
+  });
+};
+createUsernames(accounts);
+console.log(account1.movements);
+
+const withdrawals = account1.movements.filter(function (mov) {
+  return mov < 0;
+});
+console.log(withdrawals);
